@@ -46,6 +46,34 @@ namespace RhinoInsideUnity
 
             return new Rhino.Geometry.Plane(origin, direction);
         }
+
+        /// <summary>
+        /// Converts a UnityEngine.Transform object to a Rhino.Geometry.Plane object.
+        /// </summary>
+        /// <param name="unityVector"> The UnityEngine.Transform to convert.</param>
+        /// <returns>A new instance of a Rhino.Geometry.Plane object.</returns>
+        public static Rhino.Geometry.Plane ToRhinoPlane(this UnityEngine.Transform unityTransform)
+        {
+            Rhino.Geometry.Plane rhinoPlane = new Rhino.Geometry.Plane();
+            rhinoPlane.Origin = unityTransform.position.ToRhinoPoint();
+            rhinoPlane.ZAxis = unityTransform.up.ToRhinoVector();
+            rhinoPlane.XAxis = unityTransform.right.ToRhinoVector();
+            return rhinoPlane;
+        }
+
+        /// <summary>
+        /// Converts a UnityEngine.Transform object to a Rhino.Geometry.Plane object, and passes it to an existing Plane object (no memory allocations).
+        /// </summary>
+        /// <param name="unityVector"> The UnityEngine.Transform to convert.</param>
+        /// <returns> True on success.</returns>
+        public static bool ToRhinoPlaneNonAlloc(this UnityEngine.Transform unityTransform, ref  Rhino.Geometry.Plane rhinoPlane)
+        {
+            rhinoPlane.Origin = unityTransform.position.ToRhinoPoint();
+            rhinoPlane.ZAxis = unityTransform.up.ToRhinoVector();
+            rhinoPlane.XAxis = unityTransform.right.ToRhinoVector();
+            return true;
+        }
+
         #endregion
 
         #endregion
