@@ -84,9 +84,19 @@ namespace RhinoInsideUnity
         /// <summary>
         /// Converts a Rhino.Geometry.Point3d object to a UnityEngine.Vector3 struct .
         /// </summary>
-        /// <param name="rhinoPoint"> The Rhino.Geometry.Vector3d to convert.</param>
+        /// <param name="rhinoPoint"> The Rhino.Geometry.Point3d to convert.</param>
         /// <returns>A new UnityEngine.Vector3.</returns>
         public static Vector3 ToUnityVector(this Rhino.Geometry.Point3d rhinoPoint)
+        {
+            return new Vector3((float)rhinoPoint.X, (float)rhinoPoint.Z, (float)rhinoPoint.Y);
+        }
+
+        /// <summary>
+        /// Converts a Rhino.Geometry.Point3f object to a UnityEngine.Vector3 struct .
+        /// </summary>
+        /// <param name="rhinoPoint"> The Rhino.Geometry.Point3f  to convert.</param>
+        /// <returns>A new UnityEngine.Vector3.</returns>
+        public static Vector3 ToUnityVector(this Rhino.Geometry.Point3f rhinoPoint)
         {
             return new Vector3((float)rhinoPoint.X, (float)rhinoPoint.Z, (float)rhinoPoint.Y);
         }
@@ -102,6 +112,16 @@ namespace RhinoInsideUnity
         }
 
         /// <summary>
+        /// Converts a Rhino.Geometry.Vector3f object to a UnityEngine.Vector3 struct .
+        /// </summary>
+        /// <param name="rhinoPoint"> The Rhino.Geometry.Vector3f  to convert.</param>
+        /// <returns>A new UnityEngine.Vector3.</returns>
+        public static Vector3 ToUnityVector(this Rhino.Geometry.Vector3f rhinoVector)
+        {
+            return new Vector3((float)rhinoVector.X, (float)rhinoVector.Z, (float)rhinoVector.Y);
+        }
+
+        /// <summary>
         /// Converts a Rhino.Geometry.Line object to a UnityEngine.Vector3 struct .
         /// </summary>
         /// <param name="rhinoVector"> The Rhino.Geometry.Line to convert.</param>
@@ -109,6 +129,48 @@ namespace RhinoInsideUnity
         public static Vector3 ToUnityVector(this Rhino.Geometry.Line rhinoLine, bool normalize = true)
         {
             return normalize ? (rhinoLine.To.ToUnityVector() - rhinoLine.From.ToUnityVector()).normalized : (rhinoLine.To.ToUnityVector() - rhinoLine.From.ToUnityVector());
+        }
+        #endregion
+
+        #region To Vector2
+        /// <summary>
+        /// Converts a Rhino.Geometry.Point2d object to a UnityEngine.Vector2 struct .
+        /// </summary>
+        /// <param name="rhinoPoint"> The Rhino.Geometry.Point2d to convert.</param>
+        /// <returns>A new UnityEngine.Vector2.</returns>
+        public static Vector3 ToUnityVector(this Rhino.Geometry.Point2d rhinoPoint)
+        {
+            return new Vector2((float)rhinoPoint.X, (float)rhinoPoint.Y);
+        }
+
+        /// <summary>
+        /// Converts a Rhino.Geometry.Point2f object to a UnityEngine.Vector3 struct .
+        /// </summary>
+        /// <param name="rhinoPoint"> The Rhino.Geometry.Point2f  to convert.</param>
+        /// <returns>A new UnityEngine.Vector2.</returns>
+        public static Vector2 ToUnityVector(this Rhino.Geometry.Point2f rhinoPoint)
+        {
+            return new Vector2((float)rhinoPoint.X, (float)rhinoPoint.Y);
+        }
+
+        /// <summary>
+        /// Converts a Rhino.Geometry.Vector2d object to a UnityEngine.Vector3 struct .
+        /// </summary>
+        /// <param name="rhinoVector"> The Rhino.Geometry.Vector2d to convert.</param>
+        /// <returns>A new UnityEngine.Vector2.</returns>
+        public static Vector2 ToUnityVector(this Rhino.Geometry.Vector2d rhinoVector)
+        {
+            return new Vector2((float)rhinoVector.X, (float)rhinoVector.Y);
+        }
+
+        /// <summary>
+        /// Converts a Rhino.Geometry.Vector2f object to a UnityEngine.Vector3 struct .
+        /// </summary>
+        /// <param name="rhinoPoint"> The Rhino.Geometry.Vector2f  to convert.</param>
+        /// <returns>A new UnityEngine.Vector2.</returns>
+        public static Vector2 ToUnityVector(this Rhino.Geometry.Vector2f rhinoVector)
+        {
+            return new Vector2((float)rhinoVector.X, (float)rhinoVector.Y);
         }
         #endregion
 

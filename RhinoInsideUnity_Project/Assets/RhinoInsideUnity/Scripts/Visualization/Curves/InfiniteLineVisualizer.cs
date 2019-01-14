@@ -13,15 +13,16 @@ namespace RhinoInsideUnity.Visualization
         [Range(0, 2)] public float IntersectionVisualizationWidth = 0.1f;
         [Range(0, 25)] public float IntersectionVisualizationLength = 10;
 
-        
         void OnEnable()
         {
-            lr = GetComponent<LineRenderer>();
+            lr = transform.GetOrAddComponent<LineRenderer>();
             lr.positionCount = 2;
         }
 
         void LateUpdate()
         {
+            if (lr == null) lr = transform.GetOrAddComponent<LineRenderer>();
+
             if (line != null)
             {
                 float len = IntersectionVisualizationLength;
