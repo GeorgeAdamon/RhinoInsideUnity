@@ -639,7 +639,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b9b9457de6596f438c703c2fc4d3748, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IntersectionVisualizationWidth: 0.147
+  IntersectionVisualizationWidth: 0.068
   IntersectionVisualizationLength: 5.63
 --- !u!120 &1036727142
 LineRenderer:
@@ -689,7 +689,7 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.147
+        value: 0.068
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -698,7 +698,7 @@ LineRenderer:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 0.147
+        value: 0.068
         inSlope: 0
         outSlope: 0
         tangentMode: 0
