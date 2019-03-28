@@ -563,9 +563,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   From: {x: 4.694168, y: 0, z: 0}
-  To: {x: 0, y: 0, z: -5.6826687}
+  To: {x: 4.951438, y: 4.09974, z: -10.483339}
   UniformColor: {r: 0, g: 1, b: 0.3440554, a: 1}
-  OrientHandlesInWorldSpace: 1
+  OrientHandlesInWorldSpace: 0
 --- !u!4 &1008164383
 Transform:
   m_ObjectHideFlags: 0
