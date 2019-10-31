@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Rhino.Geometry;
+using RhinoInsideUnity.Extensions;
 
 namespace RhinoInsideUnity
 {
@@ -14,74 +15,95 @@ namespace RhinoInsideUnity
         #region RHINO TO UNITY CONVERSIONS
 
         #region To Unity Mesh
-
-        #region Without Transform
         /// <summary>
         /// Converts a Rhino.Geometry.Mesh object to a UnityEngine.Mesh object.
         /// </summary>
         /// <param name="rhinoMesh"> The Rhino.Geometry.Mesh to convert.</param>
+        /// <param name="unityMesh"> Optional mesh to pass, to avoid new allocations.</param>
+        /// <param name="transform"> Optional transformation matrix.</param>
         /// <returns>A new instance of a UnityEngine.Mesh object.</returns>
-        public static UnityEngine.Mesh ToUnityMesh(this Rhino.Geometry.Mesh rhinoMesh)
+        public static UnityEngine.Mesh ToUnityMesh(this Rhino.Geometry.Mesh rhinoMesh, UnityEngine.Mesh unityMesh = null, UnityEngine.Transform transform = null)
         {
-            UnityEngine.Mesh unityMesh = new UnityEngine.Mesh();
-
-            int vertexCount = rhinoMesh.Vertices.Count;
-            int faceCount = rhinoMesh.Faces.Count;
-            int normalCount = rhinoMesh.Normals.Count;
-            int uvCount = rhinoMesh.TextureCoordinates.Count;
-            int colorCount = rhinoMesh.VertexColors.Count;
-
-            List<Vector3> vertices = new List<Vector3>();
-            List<int> triangles = new List<int>();
-            List<Vector3> normals = new List<Vector3>();
-            List<Vector2> uvs = new List<Vector2>();
-            List<Color> colors = new List<Color>();
-
-            #region Convert Vertices
-
-            for (int i = 0; i < vertexCount; i++)
+            if (unityMesh == null)
             {
-                vertices.Add(rhinoMesh.Vertices[i].ToUnityVector());
+                unityMesh = new UnityEngine.Mesh();
+            }
+            else
+            {
+                unityMesh.Clear();
             }
 
-            unityMesh.SetVertices(vertices);
+            var vertexCount = rhinoMesh.Vertices.Count;
+            var faceCount = rhinoMesh.Faces.Count;
+            var normalCount = rhinoMesh.Normals.Count;
+            var uvCount = rhinoMesh.TextureCoordinates.Count;
+            var colorCount = rhinoMesh.VertexColors.Count;
+            
+            // Lists for passing to the Unity.Mesh API
+            var vertices = new List<Vector3>(vertexCount);
+            var triangles = new List<int>(faceCount*4);
+            var normals = new List<Vector3>(normalCount);
+            var uvs = new List<Vector2>(uvCount);
+            var colors = new List<Color>(colorCount);
 
+            // Temporary allocations to avoid calling List<T>.Add
+            var tempVerts = new Vector3[vertexCount];
+            var threePack = new int[3];
+            var sixPack = new int[6];
+            var tempUv = new Vector2[uvCount];
+            var tempCol = new Color[colorCount];
+            
+            #region Convert Vertices
+            if (transform != null)
+            {
+                for (var i = 0; i < vertexCount; i++)
+                {
+                    tempVerts[i] = transform.InverseTransformPoint(rhinoMesh.Vertices[i].ToUnityVector());
+                }
+            }
+            else
+            {
+                for (var i = 0; i < vertexCount; i++)
+                {
+                    tempVerts[i] = rhinoMesh.Vertices[i].ToUnityVector();
+                }
+            }
+            
+            vertices.AddRange(tempVerts);
+            unityMesh.SetVertices(vertices);
             #endregion
 
 
             #region Convert Faces
-
-            for (int i = 0; i < faceCount; i++)
+            
+            for (var i = 0; i < faceCount; i++)
             {
-                Rhino.Geometry.MeshFace face = rhinoMesh.Faces[i];
+                var face = rhinoMesh.Faces[i];
 
                 if (face.IsTriangle)
                 {
-                    triangles.Add(face.A);
-                    triangles.Add(face.C);
-                    triangles.Add(face.B);
+                    threePack[0] = face.A;
+                    threePack[1] = face.C;
+                    threePack[2] = face.B;
+                    
+                    triangles.AddRange(threePack);
                 }
                 else
                 {
-                    triangles.Add(face.A);
-                    triangles.Add(face.D);
-                    triangles.Add(face.B);
-
-                    triangles.Add(face.B);
-                    triangles.Add(face.D);
-                    triangles.Add(face.C);
+                    sixPack[0] = face.A;
+                    sixPack[1] = face.D;
+                    sixPack[2] = face.B;
+                    sixPack[3] = face.B;
+                    sixPack[4] = face.D;
+                    sixPack[5] = face.C;
+                    
+                    triangles.AddRange(sixPack);
                 }
             }
-
             unityMesh.SetTriangles(triangles, 0);
-
             #endregion
-
-
-
-
-            /*
             
+            /*
             #region Convert Normals
             if (normalCount > 0 )
             {
@@ -95,250 +117,32 @@ namespace RhinoInsideUnity
                 unityMesh.RecalculateNormals();
             }
             #endregion
-    */
-            #region Convert UVs
-
-            if (uvCount > 0)
-            {
-                for (int i = 0; i < uvCount; i++)
-                {
-                    uvs.Add(rhinoMesh.TextureCoordinates[i].ToUnityVector());
-                }
-            }
-
-            #endregion
-
-            #region Convert Colors
-            if (colorCount > 0)
-            {
-                for (int i=0; i<colorCount;i++)
-                {
-                    colors.Add(rhinoMesh.VertexColors[i].ToUnityColor());
-                }
-            }
-
-            unityMesh.SetColors(colors);
-
-            #endregion
-
-            unityMesh.RecalculateNormals();
-            unityMesh.RecalculateTangents();
-            unityMesh.RecalculateBounds();
-
-            return unityMesh;
-        }
-
-        /// <summary>
-        /// Converts a Rhino.Geometry.Mesh object to a UnityEngine.Mesh object, and assigns it to an existing reference.
-        /// </summary>
-        /// <param name="rhinoMesh"> The Rhino.Geometry.Mesh to convert.</param>
-        /// <param name="unityMesh"> The reference to an existing UnityEngine.Mesh instance.</param>
-        /// <returns>A new instance of a UnityEngine.Mesh object.</returns>
-        public static void ToUnityMesh(this Rhino.Geometry.Mesh rhinoMesh, ref UnityEngine.Mesh unityMesh)
-        {
-            unityMesh = new UnityEngine.Mesh();
-
-            int vertexCount = rhinoMesh.Vertices.Count;
-            int faceCount = rhinoMesh.Faces.Count;
-            int normalCount = rhinoMesh.Normals.Count;
-            int uvCount = rhinoMesh.TextureCoordinates.Count;
-            int colorCount = rhinoMesh.VertexColors.Count;
-
-            List<Vector3> vertices = new List<Vector3>();
-            List<int> triangles = new List<int>();
-            List<Vector3> normals = new List<Vector3>();
-            List<Vector2> uvs = new List<Vector2>();
-            List<Color> colors = new List<Color>();
-
-
-            #region Convert Vertices
-
-            for (int i = 0; i < vertexCount; i++)
-            {
-                vertices.Add(rhinoMesh.Vertices[i].ToUnityVector());
-            }
-
-            unityMesh.SetVertices(vertices);
-
-            #endregion
-
-            #region Convert Faces
-
-            for (int i = 0; i < faceCount; i++)
-            {
-                Rhino.Geometry.MeshFace face = rhinoMesh.Faces[i];
-
-                if (face.IsTriangle)
-                {
-                    triangles.Add(face.A);
-                    triangles.Add(face.C);
-                    triangles.Add(face.B);
-                }
-                else
-                {
-                    triangles.Add(face.A);
-                    triangles.Add(face.D);
-                    triangles.Add(face.B);
-
-                    triangles.Add(face.B);
-                    triangles.Add(face.D);
-                    triangles.Add(face.C);
-                }
-            }
-
-            unityMesh.SetTriangles(triangles, 0);
-
-            #endregion
-            /*
-            #region Convert Normals
-
-            if (normalCount > 0)
-            {
-                for (int i = 0; i < normalCount; i++)
-                {
-                    normals.Add(rhinoMesh.Normals[i].ToUnityVector());
-                }
-            }
-            else
-            {
-                unityMesh.RecalculateNormals();
-            }
-           
-
-
-            #endregion
-     */
-            #region Convert UVs
-
-            if (uvCount > 0)
-            {
-                for (int i = 0; i < uvCount; i++)
-                {
-                    uvs.Add(rhinoMesh.TextureCoordinates[i].ToUnityVector());
-                }
-            }
-
-            #endregion
-
-            #region Convert Colors
-            if (colorCount > 0)
-            {
-                for (int i = 0; i < colorCount; i++)
-                {
-                    colors.Add(rhinoMesh.VertexColors[i].ToUnityColor());
-                }
-            }
-
-            unityMesh.SetColors(colors);
-
-            #endregion
-
-            unityMesh.RecalculateNormals();
-            unityMesh.RecalculateTangents();
-            unityMesh.RecalculateBounds();
-        }
-        #endregion
-
-        #region With Transform
-        /// <summary>
-        /// Converts a Rhino.Geometry.Mesh object to a UnityEngine.Mesh object.
-        /// </summary>
-        /// <param name="rhinoMesh"> The Rhino.Geometry.Mesh to convert.</param>
-        /// <returns>A new instance of a UnityEngine.Mesh object.</returns>
-        public static UnityEngine.Mesh ToUnityMesh(this Rhino.Geometry.Mesh rhinoMesh, UnityEngine.Transform _transform)
-        {
-            UnityEngine.Mesh unityMesh = new UnityEngine.Mesh();
-
-            int vertexCount = rhinoMesh.Vertices.Count;
-            int faceCount = rhinoMesh.Faces.Count;
-            int normalCount = rhinoMesh.Normals.Count;
-            int uvCount = rhinoMesh.TextureCoordinates.Count;
-            int colorCount = rhinoMesh.VertexColors.Count;
-
-            List<Vector3> vertices = new List<Vector3>();
-            List<int> triangles = new List<int>();
-            List<Vector3> normals = new List<Vector3>();
-            List<Vector2> uvs = new List<Vector2>();
-            List<Color> colors = new List<Color>();
-
-            #region Convert Vertices
-
-            for (int i = 0; i < vertexCount; i++)
-            {
-                vertices.Add(_transform.InverseTransformPoint(rhinoMesh.Vertices[i].ToUnityVector()));
-            }
-
-            unityMesh.SetVertices(vertices);
-
-            #endregion
-
-            #region Convert Faces
-
-            for (int i = 0; i < faceCount; i++)
-            {
-                Rhino.Geometry.MeshFace face = rhinoMesh.Faces[i];
-
-                if (face.IsTriangle)
-                {
-                    triangles.Add(face.A);
-                    triangles.Add(face.C);
-                    triangles.Add(face.B);
-                }
-                else
-                {
-                    triangles.Add(face.A);
-                    triangles.Add(face.D);
-                    triangles.Add(face.B);
-
-                    triangles.Add(face.B);
-                    triangles.Add(face.D);
-                    triangles.Add(face.C);
-                }
-            }
-
-            unityMesh.SetTriangles(triangles, 0);
-
-            #endregion
-
-            /*
+            */
             
-            #region Convert Normals
-            if (normalCount > 0 )
-            {
-                for (int i = 0; i < normalCount; i++)
-                {
-                    normals.Add(rhinoMesh.Normals[i].ToUnityVector());
-                }
-            }
-            else
-            {
-                unityMesh.RecalculateNormals();
-            }
-            #endregion
-    */
             #region Convert UVs
-
             if (uvCount > 0)
             {
-                for (int i = 0; i < uvCount; i++)
+                for (var i = 0; i < uvCount; i++)
                 {
-                    uvs.Add(rhinoMesh.TextureCoordinates[i].ToUnityVector());
+                    tempUv[i] = rhinoMesh.TextureCoordinates[i].ToUnityVector();
                 }
+                
+                uvs.AddRange(tempUv);
+                unityMesh.SetUVs(0, uvs);
             }
-
             #endregion
 
             #region Convert Colors
             if (colorCount > 0)
             {
-                for (int i = 0; i < colorCount; i++)
+                for (var i=0; i<colorCount;i++)
                 {
-                    colors.Add(rhinoMesh.VertexColors[i].ToUnityColor());
+                    tempCol[i] = rhinoMesh.VertexColors[i].ToUnityColor();
                 }
+                
+                colors.AddRange(tempCol);
+                unityMesh.SetColors(colors);
             }
-
-            unityMesh.SetColors(colors);
-
             #endregion
 
             unityMesh.RecalculateNormals();
@@ -347,119 +151,9 @@ namespace RhinoInsideUnity
 
             return unityMesh;
         }
-
-        /// <summary>
-        /// Converts a Rhino.Geometry.Mesh object to a UnityEngine.Mesh object, and assigns it to an existing reference.
-        /// </summary>
-        /// <param name="rhinoMesh"> The Rhino.Geometry.Mesh to convert.</param>
-        /// <param name="unityMesh"> The reference to an existing UnityEngine.Mesh instance.</param>
-        /// <returns>A new instance of a UnityEngine.Mesh object.</returns>
-        public static void ToUnityMesh(this Rhino.Geometry.Mesh rhinoMesh, ref UnityEngine.Mesh unityMesh, UnityEngine.Transform _transform)
-        {
-
-            int vertexCount = rhinoMesh.Vertices.Count;
-            int faceCount = rhinoMesh.Faces.Count;
-            int normalCount = rhinoMesh.Normals.Count;
-            int uvCount = rhinoMesh.TextureCoordinates.Count;
-            int colorCount = rhinoMesh.VertexColors.Count;
-
-            List<Vector3> vertices = new List<Vector3>();
-            List<int> triangles = new List<int>();
-            List<Vector3> normals = new List<Vector3>();
-            List<Vector2> uvs = new List<Vector2>();
-            List<Color> colors = new List<Color>();
-
-            #region Convert Vertices
-
-            for (int i = 0; i < vertexCount; i++)
-            {
-                vertices.Add( _transform.InverseTransformPoint (rhinoMesh.Vertices[i].ToUnityVector()));
-            }
-
-            unityMesh.SetVertices(vertices);
-
-            #endregion
-
-            #region Convert Faces
-
-            for (int i = 0; i < faceCount; i++)
-            {
-                Rhino.Geometry.MeshFace face = rhinoMesh.Faces[i];
-
-                if (face.IsTriangle)
-                {
-                    triangles.Add(face.A);
-                    triangles.Add(face.C);
-                    triangles.Add(face.B);
-                }
-                else
-                {
-                    triangles.Add(face.A);
-                    triangles.Add(face.D);
-                    triangles.Add(face.B);
-
-                    triangles.Add(face.B);
-                    triangles.Add(face.D);
-                    triangles.Add(face.C);
-                }
-            }
-
-            unityMesh.SetTriangles(triangles, 0);
-
-            #endregion
-
-            /*
-            #region Convert Normals
-
-            if (normalCount > 0)
-            {
-                for (int i = 0; i < normalCount; i++)
-                {
-                    normals.Add(rhinoMesh.Normals[i].ToUnityVector());
-                }
-            }
-            else
-            {
-                unityMesh.RecalculateNormals();
-            }
-           
-
-
-            #endregion
-     */
-            #region Convert UVs
-
-            if (uvCount > 0)
-            {
-                for (int i = 0; i < uvCount; i++)
-                {
-                    uvs.Add(rhinoMesh.TextureCoordinates[i].ToUnityVector());
-                }
-            }
-
-            #endregion
-
-            #region Convert Colors
-            if (colorCount > 0)
-            {
-                for (int i = 0; i < colorCount; i++)
-                {
-                    colors.Add(rhinoMesh.VertexColors[i].ToUnityColor());
-                }
-            }
-
-            unityMesh.SetColors(colors);
-
-            #endregion
-
-            unityMesh.RecalculateNormals();
-            unityMesh.RecalculateTangents();
-            unityMesh.RecalculateBounds();
-        }
+        #endregion
+        
         #endregion
 
-        #endregion
-
-        #endregion
     }
 }

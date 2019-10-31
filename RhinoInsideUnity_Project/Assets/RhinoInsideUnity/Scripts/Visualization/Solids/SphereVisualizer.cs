@@ -35,7 +35,7 @@ namespace RhinoInsideUnity.Visualization
 
                 if (unityMesh != null)
                 {
-                    Rhino.Compute.MeshCompute.CreateFromSphere(new Rhino.Geometry.Sphere(new Point3d(0,0,0), 1), UCount, VCount).ToUnityMesh(ref unityMesh);
+                    Rhino.Compute.MeshCompute.CreateFromSphere(new Rhino.Geometry.Sphere(new Point3d(0,0,0), 1), UCount, VCount).ToUnityMesh(unityMesh);
                 }
 
                 else
