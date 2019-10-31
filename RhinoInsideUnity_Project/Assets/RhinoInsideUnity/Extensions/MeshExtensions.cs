@@ -19,7 +19,7 @@ namespace RhinoInsideUnity.Extensions
         /// <param name="unityMesh"> Optional mesh to pass, to avoid new allocations.</param>
         /// <param name="transform"> Optional transformation matrix.</param>
         /// <returns>A new instance of a UnityEngine.Mesh object.</returns>
-        public static UnityEngine.Mesh ToUnityMesh(this Rhino.Geometry.Mesh rhinoMesh, UnityEngine.Mesh unityMesh = null, UnityEngine.Transform transform = null)
+        public static void ToUnityMesh(this Rhino.Geometry.Mesh rhinoMesh, UnityEngine.Mesh unityMesh = null, UnityEngine.Transform transform = null)
         {
             if (unityMesh == null)
             {
@@ -147,7 +147,6 @@ namespace RhinoInsideUnity.Extensions
             unityMesh.RecalculateTangents();
             unityMesh.RecalculateBounds();
 
-            return unityMesh;
         }
         #endregion
         

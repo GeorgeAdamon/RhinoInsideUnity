@@ -8,24 +8,23 @@ using RhinoInsideUnity.Visualization;
 namespace RhinoInsideUnity.Geometries.Solids
 {
     [ExecuteInEditMode]
-    public class Sphere : MonoBehaviour
+    public class RhinoSphere : RhinoPrimitiveBase
     {
-        [HideInInspector]
-        public Rhino.Geometry.Sphere sphere;
-
-        public Vector3 Center;
         [Range(0,10.0f)] public float Radius;
-
-        private void OnEnable()
+        
+        public Rhino.Geometry.Sphere rhGeo;
+        
+        public override void OnEnable()
         {
             name = "Rhino Sphere Object";
         }
 
-        public void Update()
+        public override void Update()
         {
-            Center = transform.position;
-            sphere.Center = Center.ToRhinoPoint();
-            sphere.Radius = Radius;
+            base.Update();
+            
+            rhGeo.Center = center.ToRhinoPoint();
+            rhGeo.Radius = Radius;
             transform.localScale = Vector3.one * Radius;
         }
     }

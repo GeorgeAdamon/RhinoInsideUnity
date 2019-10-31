@@ -53,19 +53,25 @@
           <e p="RhinoCompute.cs" t="Include" />
           <e p="Scripts" t="Include">
             <e p="Editor" t="Include">
+              <e p="RhinoObjectSerialization" t="Include">
+                <e p="RhinoPrimitiveEditor.cs" t="Include" />
+              </e>
               <e p="Unity Components" t="Include">
                 <e p="InfiniteLineEditor.cs" t="Include" />
                 <e p="LineSegmentEditor.cs" t="Include" />
-                <e p="SphereEditor.cs" t="Include" />
               </e>
             </e>
             <e p="Geometries" t="Include">
+              <e p="Base" t="Include">
+                <e p="RhinoPrimitiveBase.cs" t="Include" />
+              </e>
               <e p="Curves" t="Include">
                 <e p="InfiniteLine.cs" t="Include" />
                 <e p="LineSegment.cs" t="Include" />
               </e>
               <e p="Solids" t="Include">
-                <e p="Sphere.cs" t="Include" />
+                <e p="RhinoBox.cs" t="Include" />
+                <e p="RhinoSphere.cs" t="Include" />
               </e>
             </e>
             <e p="Intersections" t="Include">
@@ -76,6 +82,7 @@
                 <e p="InfiniteLineVisualizer.cs" t="Include" />
               </e>
               <e p="Solids" t="Include">
+                <e p="BoxVisualizer.cs" t="Include" />
                 <e p="SphereVisualizer.cs" t="Include" />
               </e>
             </e>

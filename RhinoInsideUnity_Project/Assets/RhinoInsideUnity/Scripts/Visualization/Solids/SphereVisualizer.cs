@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Rhino.Compute;
@@ -9,7 +10,7 @@ using RhinoInsideUnity.Geometries.Solids;
 namespace RhinoInsideUnity.Visualization
 {
     [ExecuteInEditMode]
-    [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(Geometries.Solids.Sphere))]
+    [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(Geometries.Solids.RhinoSphere))]
     public class SphereVisualizer : MonoBehaviour
     {
         #region Public Variables
@@ -24,7 +25,8 @@ namespace RhinoInsideUnity.Visualization
 
         #region Private Variables
 
-        private Geometries.Solids.Sphere sphereScript;
+        private Rhino.Geometry.Sphere baseSphere;
+        private Geometries.Solids.RhinoSphere _rhinoSphereScript;
         public UnityEngine.Mesh unityMesh;
         private MeshFilter mf;
 
@@ -33,26 +35,21 @@ namespace RhinoInsideUnity.Visualization
         void OnEnable()
         {
             mf = transform.GetOrAddComponent<MeshFilter>();
-            sphereScript = transform.GetOrAddComponent<Geometries.Solids.Sphere>();
+            _rhinoSphereScript = transform.GetOrAddComponent<Geometries.Solids.RhinoSphere>();
+            baseSphere = new Rhino.Geometry.Sphere(new Point3d(0, 0, 0), 1);
             RhinoComputeAuthorization.RequestAuthorization();
+        }
+
+        private void OnValidate()
+        {
+            ReconstructGeometry(true);
         }
 
         public void ReconstructGeometry(bool requiresRemeshing)
         {
-            if (unityMesh != null)
-            {
-                MeshCompute.CreateFromSphere(new Rhino.Geometry.Sphere(new Point3d(0, 0, 0), 1), UCount, VCount)
-                    .ToUnityMesh(unityMesh);
-            }
-
-            else
-            {
-                unityMesh = MeshCompute
-                    .CreateFromSphere(new Rhino.Geometry.Sphere(new Point3d(0, 0, 0), 1), UCount, VCount).ToUnityMesh();
-            }
-
+            MeshCompute.CreateFromSphere(baseSphere, UCount, VCount).ToUnityMesh(unityMesh);
             unityMesh.name = "Mesh from Rhino Sphere";
-            mf.sharedMesh = unityMesh;
+            mf.mesh = unityMesh;
         }
     }
 }
