@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Rhino.Geometry;
+using RhinoInsideUnity.Extensions;
 using RhinoInsideUnity.Visualization;
 
 namespace RhinoInsideUnity.Geometries.Solids

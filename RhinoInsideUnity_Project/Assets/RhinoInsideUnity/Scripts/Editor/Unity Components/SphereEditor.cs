@@ -18,7 +18,6 @@ public class SphereVisualizerEditor : Editor
 
     public override void OnInspectorGUI()
     {
-
         EditorGUI.BeginChangeCheck();
 
         script.UCount = EditorGUILayout.IntSlider("U Count", script.UCount, 0, 200);

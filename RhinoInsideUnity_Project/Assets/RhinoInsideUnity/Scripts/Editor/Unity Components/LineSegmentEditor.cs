@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using RhinoInsideUnity.Geometries;
 using RhinoInsideUnity;
+using RhinoInsideUnity.Extensions;
 
 [CustomEditor(typeof(LineSegment))]
 [CanEditMultipleObjects]

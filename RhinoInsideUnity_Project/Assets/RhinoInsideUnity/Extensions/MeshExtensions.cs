@@ -1,10 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using Rhino.Geometry;
-using RhinoInsideUnity.Extensions;
 
-namespace RhinoInsideUnity
+namespace RhinoInsideUnity.Extensions
 {
     public static class MeshExtensions
     {
@@ -48,6 +45,7 @@ namespace RhinoInsideUnity
 
             // Temporary allocations to avoid calling List<T>.Add
             var tempVerts = new Vector3[vertexCount];
+            var tempNorms = new Vector3[normalCount];
             var threePack = new int[3];
             var sixPack = new int[6];
             var tempUv = new Vector2[uvCount];
@@ -103,21 +101,22 @@ namespace RhinoInsideUnity
             unityMesh.SetTriangles(triangles, 0);
             #endregion
             
-            /*
             #region Convert Normals
             if (normalCount > 0 )
             {
                 for (int i = 0; i < normalCount; i++)
                 {
-                    normals.Add(rhinoMesh.Normals[i].ToUnityVector());
+                    tempNorms[i] = rhinoMesh.Normals[i].ToUnityVector();
                 }
+                normals.AddRange(tempNorms);
+                unityMesh.SetNormals(normals);
             }
             else
             {
                 unityMesh.RecalculateNormals();
             }
             #endregion
-            */
+            
             
             #region Convert UVs
             if (uvCount > 0)
@@ -144,8 +143,7 @@ namespace RhinoInsideUnity
                 unityMesh.SetColors(colors);
             }
             #endregion
-
-            unityMesh.RecalculateNormals();
+            
             unityMesh.RecalculateTangents();
             unityMesh.RecalculateBounds();
 

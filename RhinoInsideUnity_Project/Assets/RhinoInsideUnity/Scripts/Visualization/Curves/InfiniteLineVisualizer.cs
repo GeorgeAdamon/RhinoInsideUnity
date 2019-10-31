@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Rhino.Geometry;
+using RhinoInsideUnity.Extensions;
 
 namespace RhinoInsideUnity.Visualization
 {

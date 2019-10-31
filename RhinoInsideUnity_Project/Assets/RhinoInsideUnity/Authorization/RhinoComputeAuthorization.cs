@@ -10,7 +10,6 @@ namespace RhinoInsideUnity
         public static void RequestAuthorization()
         {
             ComputeServer.AuthToken = Token;
-
         }
     }
 }

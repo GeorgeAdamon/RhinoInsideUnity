@@ -1,5 +1,6 @@
 ﻿using Rhino.Geometry.Intersect;
 using RhinoInsideUnity;
+using RhinoInsideUnity.Extensions;
 using UnityEngine;
 using RhinoInsideUnity.Visualization;
 

@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Rhino.Geometry;
 using UnityEngine;
-using Rhino.Geometry;
 
-namespace RhinoInsideUnity
+namespace RhinoInsideUnity.Extensions
 {
     public static class VectorExtensions
     {
